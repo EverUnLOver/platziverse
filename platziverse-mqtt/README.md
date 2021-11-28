@@ -47,4 +47,16 @@
 npm init
 npm i --save-dev standard nodemon
 npm i --save debug aedes aedes-persistence-redis mqemitter-redis redis chalk
+npm i -g mqtt
+// in package.json
+dependencies: {
+  "platziverse-db": "file:../platziverse-db",
+}
+npm i //auto update changes in local module with patron mono repo
+```
+
+## MQTT
+
+```bash
+mqtt pub -t 'agent/message' -h localhost -m "{'hello' : 'platziverse'}"
 ```

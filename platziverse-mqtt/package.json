@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "A Simple IoT Platform - MQTT Server",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "NODE_ENV=production node server.js",
@@ -29,6 +30,7 @@
     "chalk": "^5.0.0",
     "debug": "^4.3.2",
     "mqemitter-redis": "^4.1.0",
+    "platziverse-db": "file:../platziverse-db",
     "redis": "^4.0.0"
   }
 }
