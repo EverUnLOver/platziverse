@@ -9,3 +9,4 @@ GRANT ALL PRIVILEGES ON DATABASE plaziverse TO platzi;
 ALTER DATABASE plaziverse OWNER TO platzi;
 \du
 \quit
+select * from agents;

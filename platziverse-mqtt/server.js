@@ -8,7 +8,7 @@ import redisPersistence from 'aedes-persistence-redis'
 import chalk from 'chalk'
 import net from 'net'
 import db from 'platziverse-db'
-import { parsePayload } from './utils'
+import { parsePayload } from './utils.js'
 // const chalk = (...args) => import('chalk').then(({ default: chalk }) => chalk(...args))
 
 const LOG = debug('platziverse:mqtt')
@@ -25,7 +25,7 @@ const config = {
   password: process.env.DB_PASS || 'platzi',
   host: process.env.DB_HOST || 'localhost',
   dialect: 'postgres',
-  logging: s => debug(s)
+  logging: s => LOG(s)
 }
 
 const mq = mqemitter(setting)
@@ -47,9 +47,34 @@ broker.on('client', client => {
   clients.set(client.id, null)
 })
 
-broker.on('clientDisconnect', client => {
+broker.on('clientDisconnect', async client => {
   // console.log(`${chalk.green('[platziverse-mqtt]')} client disconnected`, client.id)
   LOG(`Client Disconnected: ${client.id}`)
+  const agent = clients.get(client.id)
+
+  if (agent) {
+    // Mark Agent as offline
+    agent.connected = false
+
+    try {
+      await Agent.createOrUpdate(agent)
+    } catch (err) {
+      return handleError(err)
+    }
+
+    // Delete Agent from Clients list
+    clients.delete(client.id)
+
+    broker.publish({
+      topic: 'agent/disconnected',
+      payload: JSON.stringify({
+        agent: {
+          uuid: agent.uuid
+        }
+      })
+    })
+    LOG(`Client (${client.id}) associated to Agent (${agent.uuid}) marked as disconnected`)
+  }
 })
 
 broker.on('publish', async (packet, client) => {
@@ -94,6 +119,19 @@ broker.on('publish', async (packet, client) => {
             })
           })
         }
+
+        // Store Metrics
+        const saveMetricsPromises = payload.metrics.map(async (metric) => {
+          let m
+
+          try {
+            m = await Metric.create(agent.uuid, metric)
+          } catch (e) {
+            return handleError(e)
+          }
+
+          LOG(`Metric ${m.id} saved on agent ${agent.uuid}`)
+        })
       }
       break
   }
