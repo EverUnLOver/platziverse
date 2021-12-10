@@ -1,0 +1,27 @@
+{
+  "name": "platziverse-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A simple IoT Platform - Agent",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/EverUnLOver/platziverse.git"
+  },
+  "author": "Sebastian Herrera <sebastian.herrera@smk.com.co>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EverUnLOver/platziverse/issues"
+  },
+  "homepage": "https://github.com/EverUnLOver/platziverse#readme",
+  "dependencies": {
+    "debug": "^4.3.3",
+    "defaults": "^1.0.3",
+    "mqtt": "^4.2.8",
+    "uuid": "^8.3.2"
+  }
+}
