@@ -5,9 +5,11 @@ import os from 'os'
 import util from 'util'
 import mqtt from 'mqtt'
 import defaults from 'defaults'
-import uuid from 'uuid'
+let uuid
+import('uuid').then(module => { uuid = module })
 import { EventEmitter } from 'events'
-import { parsePayload } from './utils'
+let parsePayload
+import('./utils.js').then(module => { parsePayload = module.parsePayload })
 
 const LOG = debug('platziverse:agent')
 
@@ -53,11 +55,11 @@ export class PlatziverseAgent extends EventEmitter {
       this._client.on('connect', () => {
         this._agentId = uuid.v4()
 
-        this.emit('connected', this._agentId)
+        this.emit('agent/connected', this._agentId)
 
         this._timer = setInterval(async () => {
           if (this._metrics.size > 0) {
-            let message = {
+            var message = {
               agent: {
                 uuid: this._agentId,
                 username: opts.username,
@@ -70,7 +72,7 @@ export class PlatziverseAgent extends EventEmitter {
             }
           }
 
-          for (let [ metric, fn] of this._metrics) {
+          for (let [ metric, fn ] of this._metrics) {
             if (fn.length == 1) {
               fn = util.promisify(fn)
             }
@@ -80,7 +82,6 @@ export class PlatziverseAgent extends EventEmitter {
               value: await Promise.resolve(fn())
             })
           }
-
           LOG('Sending message: %o', message)
 
           this._client.publish('agent/message', JSON.stringify(message))
@@ -88,7 +89,7 @@ export class PlatziverseAgent extends EventEmitter {
         }, opts.interval)
       })
 
-      this._client.on('message', (topic, payload) => {
+      this._client.on('publish', (topic, payload) => {
         payload = parsePayload(payload)
 
         let broadcast = false
@@ -96,7 +97,8 @@ export class PlatziverseAgent extends EventEmitter {
           case 'agent/connected':
           case 'agent/disconnected':
           case 'agent/message':
-            broadcast = payload && payload.agent && payload.agent.uuid !==  this._agentId
+            broadcast = payload && payload.agent && payload.agent.uuid !== this._agentId
+            // console.log('broadcast', broadcast)
             break
         }
 

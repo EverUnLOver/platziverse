@@ -1,11 +1,7 @@
-# platziverse-agent
-
-## Usage
-
-```js
-let PlatziverseAgent
-import('./index.js').then(module => { PlatziverseAgent = module.PlatziverseAgent })
-
+'use strict'
+// let PlatziverseAgent
+// import('../index.js').then(module => { PlatziverseAgent = module.PlatziverseAgent })
+import { PlatziverseAgent } from '../index.js'
 const agent = new PlatziverseAgent({
   name: 'myapp',
   username: 'admin',
@@ -28,9 +24,9 @@ agent.addMetric('callbackMetric', function getRandomCallback (callback) {
 
 agent.connect()
 
-// This agent only 
-agent.on('connected', handler)
-agent.on('disconnected', handler)
+// This agent only
+agent.on('connect', handler)
+agent.on('disconnect', handler)
 agent.on('message', handler)
 
 // Other Agents
@@ -43,11 +39,3 @@ function handler (payload) {
 }
 
 setTimeout(() => agent.disconnect(), 20000)
-```
-
-## NPM Libraries
-
-```bash
-npm i standard --save-dev
-npm install mqtt debug defaults uuid --save
-```
